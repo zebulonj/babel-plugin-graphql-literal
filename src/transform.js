@@ -6,9 +6,13 @@ import {
   visit
 } from 'graphql';
 
-const typeNonNullIDTemplate = template( 'new graphql.GraphQLNonNull( TYPE )' );
 const typeIDTemplate = template( 'graphql.GraphQLID' );
+const typeIntTemplate = template( 'graphql.GraphQLInt' );
+const typeFloatTemplate = template( 'graphql.GraphQLFloat' );
 const typeStringTemplate = template( 'graphql.GraphQLString' );
+
+const typeNonNullTemplate = template( 'new graphql.GraphQLNonNull( TYPE )' );
+const typeListTemplate = template( 'new graphql.GraphQLList( TYPE )' );
 
 const buildObjectExpression = propertiesMap => t.objectExpression(
   Object.keys( propertiesMap ).map( key => t.objectProperty( t.identifier( key ), propertiesMap[key] ) )
@@ -22,13 +26,24 @@ const buildGraphQLType = type => {
   switch ( type ) {
     case 'ID':
       return typeIDTemplate().expression;
+    case 'Int':
+      return typeIntTemplate().expression;
+    case 'Float':
+      return typeFloatTemplate().expression;
     case 'String':
       return typeStringTemplate().expression;
     default:
-      console.log( "No type mapped for:", type );
-      return typeNonNullIDTemplate().expression;
+      throw new Error( "No type mapped for: " + type );
   }
 };
+
+const buildNonNullType = type => typeNonNullTemplate({
+  TYPE: type
+}).expression;
+
+const buildListType = type => typeListTemplate({
+  TYPE: type
+}).expression;
 
 const graphQLObjectTypeTemplate = template(`
   new graphql.GraphQLObjectType({
@@ -109,6 +124,18 @@ export default function transformGraphQL( doc ) {
         console.log( '< [NamedType]' );
         const { name } = pop();
         current.type = buildGraphQLType( name );
+      }
+    },
+
+    NonNullType: {
+      leave() {
+        current.type = buildNonNullType( current.type )
+      }
+    },
+
+    ListType: {
+      leave() {
+        current.type = buildListType( current.type )
       }
     },
 
