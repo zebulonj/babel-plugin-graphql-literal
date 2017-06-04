@@ -61,6 +61,12 @@ const buildGraphQLObjectType = ({
   FIELDS: buildGraphQLFields( fields )
 });
 
+const graphQLSchemaTemplate = template( `new graphql.GraphQLSchema( PARAMS )` );
+
+const buildGraphQLSchema = params => graphQLSchemaTemplate({
+  PARAMS: buildObjectExpression( params )
+});
+
 export default function transformGraphQL( doc ) {
   // TODO: Throw an error if more than one string is received.
   const ast = parse( doc );
@@ -87,6 +93,27 @@ export default function transformGraphQL( doc ) {
   visit( def, {
     enter( node ) {
       console.log( node );
+    },
+
+    SchemaDefinition: {
+      enter() {
+        push();
+      },
+      leave() {
+        current = buildGraphQLSchema( current );
+      }
+    },
+
+    OperationTypeDefinition: {
+      enter() {
+        console.log( "> [OperationTypeDefinition]" );
+        push();
+      },
+      leave( node ) {
+        const { type } = pop();
+        console.log( "< [OperationTypeDefinition]", type, node );
+        current[node.operation] = type;
+      }
     },
 
     ObjectTypeDefinition: {

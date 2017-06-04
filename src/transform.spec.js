@@ -143,11 +143,35 @@ test( "GraphQLObjectType...", sub => {
     });
     const Person = eval( js );
 
-    console.log( `${ gql }\n${ js }` );
-    console.log( "Type Config:", Person._typeConfig );
-
     assert.ok( Person._typeConfig.fields['address'], 'The `address` field should be defined on the GraphQLObjectType.' );
     assert.equal( Person._typeConfig.fields.address.type.toString(), 'Address', 'The correct non-null wrapper should be applied to the `name` field.' );
+    assert.end();
+  });
+});
+
+test( "Schema...", sub => {
+  sub.test( "...type.", assert => {
+    assert.plan( 1 );
+
+    const Query = new graphql.GraphQLObjectType({ // eslint-disable-line no-unused-vars
+      name: "Query",
+      fields: {
+        me: {
+          type: graphql.GraphQLString
+        }
+      }
+    });
+
+    const gql = `
+      schema {
+        query: Query
+      }
+    `;
+
+    const js = generate( transform( gql ) ).code;
+    const Schema = eval( js );
+
+    assert.ok( Schema instanceof graphql.GraphQLSchema, 'The fragment should evaluate to a GraphQLObjectType.' );
     assert.end();
   });
 });
