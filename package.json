@@ -1,7 +1,7 @@
 {
   "name": "babel-plugin-graphql-literals",
   "version": "0.0.0",
-  "description": "",
+  "description": "Transpose GraphQL schema language to programmatic types.",
   "main": "index.js",
   "scripts": {
     "build": "babel src --out-dir lib",
@@ -26,5 +26,20 @@
     "babel-template": "^6.24.1",
     "babel-types": "^6.24.1",
     "graphql": "^0.10.1"
-  }
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zebulonj/babel-plugin-graphql-literal.git"
+  },
+  "keywords": [
+    "GraphQL",
+    "babel"
+  ],
+  "bugs": {
+    "url": "https://github.com/zebulonj/babel-plugin-graphql-literal/issues"
+  },
+  "homepage": "https://github.com/zebulonj/babel-plugin-graphql-literal#readme"
 }
