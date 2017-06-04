@@ -1,11 +1,30 @@
 {
-  "name": "babel-plugin-syntax-graphql",
+  "name": "babel-plugin-graphql-literals",
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel src --out-dir lib",
+    "test": "tape -r babel-register 'src/**/*.spec.js' | faucet"
   },
   "author": "Zebulon Young (zebulonj@gmail.com)",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-1": "^6.24.1",
+    "babel-register": "^6.24.1",
+    "babylon": "^6.17.1",
+    "eslint": "^3.19.0",
+    "faucet": "0.0.1",
+    "tape": "^4.6.3"
+  },
+  "dependencies": {
+    "babel-generator": "^6.24.1",
+    "babel-template": "^6.24.1",
+    "babel-types": "^6.24.1",
+    "graphql": "^0.10.1"
+  }
 }
