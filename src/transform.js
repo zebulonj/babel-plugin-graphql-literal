@@ -33,7 +33,8 @@ const buildGraphQLType = type => {
     case 'String':
       return typeStringTemplate().expression;
     default:
-      throw new Error( "No type mapped for: " + type );
+      // TODO: Check whether the referenced type (identifier) is in scope?
+      return t.identifier( type );
   }
 };
 

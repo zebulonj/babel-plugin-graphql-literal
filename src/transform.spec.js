@@ -122,11 +122,32 @@ test( "GraphQLObjectType...", sub => {
     const js = generate( transform( gql ) ).code;
     const Person = eval( js );
 
+    assert.ok( Person._typeConfig.fields['children'], 'The `children` field should be defined on the GraphQLObjectType.' );
+    assert.equal( Person._typeConfig.fields.children.type.toString(), '[String]', 'The correct non-null wrapper should be applied to the `name` field.' );
+    assert.end();
+  });
+
+  sub.test( "...field: Custom.", assert => {
+    assert.plan( 2 );
+
+    const gql = `
+      type Person {
+        name: String,
+        address: Address
+      }
+    `;
+
+    const js = generate( transform( gql ) ).code;
+    const Address = new graphql.GraphQLObjectType({ // eslint-disable-line no-unused-vars
+      name: "Address"
+    });
+    const Person = eval( js );
+
     console.log( `${ gql }\n${ js }` );
     console.log( "Type Config:", Person._typeConfig );
 
-    assert.ok( Person._typeConfig.fields['children'], 'The `children` field should be defined on the GraphQLObjectType.' );
-    assert.equal( Person._typeConfig.fields.children.type.toString(), '[String]', 'The correct non-null wrapper should be applied to the `name` field.' );
+    assert.ok( Person._typeConfig.fields['address'], 'The `address` field should be defined on the GraphQLObjectType.' );
+    assert.equal( Person._typeConfig.fields.address.type.toString(), 'Address', 'The correct non-null wrapper should be applied to the `name` field.' );
     assert.end();
   });
 });
