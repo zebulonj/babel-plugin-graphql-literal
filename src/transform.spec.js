@@ -123,7 +123,7 @@ test( "GraphQLObjectType...", sub => {
     const Person = eval( js );
 
     assert.ok( Person._typeConfig.fields['children'], 'The `children` field should be defined on the GraphQLObjectType.' );
-    assert.equal( Person._typeConfig.fields.children.type.toString(), '[String]', 'The correct non-null wrapper should be applied to the `name` field.' );
+    assert.equal( Person._typeConfig.fields.children.type.toString(), '[String]', 'The correct List wrapper should be applied to the `name` field.' );
     assert.end();
   });
 
@@ -144,7 +144,29 @@ test( "GraphQLObjectType...", sub => {
     const Person = eval( js );
 
     assert.ok( Person._typeConfig.fields['address'], 'The `address` field should be defined on the GraphQLObjectType.' );
-    assert.equal( Person._typeConfig.fields.address.type.toString(), 'Address', 'The correct non-null wrapper should be applied to the `name` field.' );
+    assert.equal( Person._typeConfig.fields.address.type.toString(), 'Address', 'The correct type should be applied to the `name` field.' );
+    assert.end();
+  });
+
+  sub.test( "...arguments.", assert => {
+    assert.plan( 4 );
+
+    const gql = `
+      type Query {
+        exponent( power: Int ): Int
+      }
+    `;
+
+    const js = generate( transform( gql ) ).code;
+    const Query = eval( js );
+
+    console.log( `${ gql }\n${ js }` );
+    console.log( "Type Config:", Query._typeConfig );
+
+    assert.ok( Query._typeConfig.fields['exponent'], 'The `exponent` field should be defined on the GraphQLObjectType.' );
+    assert.equal( Query._typeConfig.fields.exponent.type.toString(), 'Int', 'The correct type should be applied to the `name` field.' );
+    assert.ok( Query._typeConfig.fields['exponent'].args['power'], 'The `power` argument should be defined on the `exponent` field.' );
+    assert.equal( Query._typeConfig.fields.exponent.args.power.type.toString(), 'Int', 'The correct type should be applied to the `power` argument.' );
     assert.end();
   });
 });

@@ -19,7 +19,7 @@ const buildObjectExpression = propertiesMap => t.objectExpression(
 );
 
 const buildGraphQLFields = ( fields ) => t.objectExpression(
-  fields.map( ({ name, type }) => t.objectProperty( t.identifier( name ), buildObjectExpression({ type }) ) )
+  fields.map( ({ name, type, args }) => t.objectProperty( t.identifier( name ), buildObjectExpression({ type, args }) ) )
 );
 
 const buildGraphQLType = type => {
@@ -132,14 +132,28 @@ export default function transformGraphQL( doc ) {
     FieldDefinition: {
       enter( node ) {
         console.log( '> [FieldDefinition]', node );
+        push({
+          args: {}
+        });
+      },
+      leave() {
+        console.log( '< [FieldDefinition]', current );
+        const { name, type, args } = pop();
+
+        current.fields.push({ name, type, args: buildObjectExpression( args ) })
+      }
+    },
+
+    InputValueDefinition: {
+      enter( node ) {
+        console.log( '> [InputValueDefinition]', node );
         push();
       },
       leave() {
-        console.log( '< [FieldDefinition]' );
-        const { name, type } = current;
+        console.log( '< [InputValueDefinition]', current );
+        const { name, type } = pop();
 
-        pop();
-        current.fields.push({ name, type })
+        current.args[name] = buildObjectExpression({ type });
       }
     },
 
