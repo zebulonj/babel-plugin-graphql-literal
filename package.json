@@ -1,11 +1,13 @@
 {
   "name": "babel-plugin-graphql-literals",
-  "version": "0.0.0",
+  "version": "0.0.0-alpha.1",
   "description": "Transpose GraphQL schema language to programmatic types.",
   "main": "index.js",
   "scripts": {
     "build": "babel src --out-dir lib",
-    "test": "tape -r babel-register 'src/**/*.spec.js' | faucet"
+    "clean": "rm -rf lib",
+    "test": "tape -r babel-register 'src/**/*.spec.js' | faucet",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "author": "Zebulon Young (zebulonj@gmail.com)",
   "license": "MIT",
