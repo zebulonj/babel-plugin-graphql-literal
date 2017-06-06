@@ -21,12 +21,22 @@ const template_GraphQLObjectType = template(`
   });
 `);
 
+const template_GraphQLInputObjectType = template(`
+  new graphql.GraphQLInputObjectType({
+    name: NAME,
+    fields: FIELDS
+  });
+`);
+
 const template_GraphQLSchema = template( `new graphql.GraphQLSchema( PARAMS )` );
 
 const GraphQLSchema = operations => template_GraphQLSchema({ PARAMS: t.objectExpression( operations ) });
 
 const GraphQLObjectType = ({ name = 'Object', fields = [] }) =>
   template_GraphQLObjectType({ NAME: t.stringLiteral( name ), FIELDS: t.objectExpression( fields ) });
+
+const GraphQLInputObjectType = ({ name, fields = [] }) =>
+  template_GraphQLInputObjectType({ NAME: t.stringLiteral( name ), FIELDS: t.objectExpression( fields ) });
 
 const GraphQLType = type => {
   switch ( type ) {
@@ -61,6 +71,7 @@ export function transform( ast ) {
 
   visit( ast, {
     enter() {
+      //console.log( `- [${ node.kind }]`, node );
       return false;
     },
 
@@ -92,6 +103,18 @@ export function transform( ast ) {
           name: transform( name ),
           fields: fields.map( field => transform( field ) )
         });
+
+        return false;
+      }
+    },
+
+    InputObjectTypeDefinition: {
+      enter( node ) {
+        const { name, fields } = node;
+        context = GraphQLInputObjectType({
+          name: transform( name ),
+          fields: fields.map( field => transform( field ) )
+        })
 
         return false;
       }

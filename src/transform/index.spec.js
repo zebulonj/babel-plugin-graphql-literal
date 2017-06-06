@@ -168,7 +168,7 @@ test( "GraphQLObjectType...", sub => {
   });
 });
 
-test.skip( "GraphQLInputObjectType...", sub => {
+test( "GraphQLInputObjectType...", sub => {
   sub.test( "...name", assert => {
     assert.plan( 1 );
 
@@ -182,10 +182,27 @@ test.skip( "GraphQLInputObjectType...", sub => {
     const js = generate( transform( gql ) ).code;
     const CartItem = eval( js );
 
-    console.log( `${ gql }\n${ js }` );
-    console.log( "Type Config:", CartItem._typeConfig );
-
     assert.ok( CartItem instanceof graphql.GraphQLInputObjectType, 'The fragment should evaluate to a GraphQLInputObjectType.' );
+    assert.end();
+  });
+
+  sub.test( "...fields", assert => {
+    assert.plan( 4 );
+
+    const gql = `
+      input CartItem {
+        product: ID!
+        quantity: Int
+      }
+    `;
+
+    const js = generate( transform( gql ) ).code;
+    const CartItem = eval( js );
+
+    assert.ok( CartItem._typeConfig.fields['product'], 'The `product` field should be defined on the GraphQLInputObjectType.' );
+    assert.ok( CartItem._typeConfig.fields['quantity'], 'The `quantity` field should be defined on the GraphQLInputObjectType.' );
+    assert.equal( CartItem._typeConfig.fields.product.type.toString(), 'ID!', 'The correct type should be applied to the `product` field.' );
+    assert.equal( CartItem._typeConfig.fields.quantity.type.toString(), 'Int', 'The correct type should be applied to the `quantity` field.' );
     assert.end();
   });
 });
