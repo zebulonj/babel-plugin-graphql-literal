@@ -2,7 +2,7 @@ import test from 'tape';
 import * as graphql from 'graphql';
 import generate from 'babel-generator';
 
-import transform from './transform';
+import transform from './index';
 
 test( "GraphQLObjectType...", sub => {
   sub.test( "...name.", assert => {
@@ -160,13 +160,32 @@ test( "GraphQLObjectType...", sub => {
     const js = generate( transform( gql ) ).code;
     const Query = eval( js );
 
-    console.log( `${ gql }\n${ js }` );
-    console.log( "Type Config:", Query._typeConfig );
-
     assert.ok( Query._typeConfig.fields['exponent'], 'The `exponent` field should be defined on the GraphQLObjectType.' );
     assert.equal( Query._typeConfig.fields.exponent.type.toString(), 'Int', 'The correct type should be applied to the `name` field.' );
     assert.ok( Query._typeConfig.fields['exponent'].args['power'], 'The `power` argument should be defined on the `exponent` field.' );
     assert.equal( Query._typeConfig.fields.exponent.args.power.type.toString(), 'Int', 'The correct type should be applied to the `power` argument.' );
+    assert.end();
+  });
+});
+
+test.skip( "GraphQLInputObjectType...", sub => {
+  sub.test( "...name", assert => {
+    assert.plan( 1 );
+
+    const gql = `
+      input CartItem {
+        product: ID!
+        quantity: Int
+      }
+    `;
+
+    const js = generate( transform( gql ) ).code;
+    const CartItem = eval( js );
+
+    console.log( `${ gql }\n${ js }` );
+    console.log( "Type Config:", CartItem._typeConfig );
+
+    assert.ok( CartItem instanceof graphql.GraphQLInputObjectType, 'The fragment should evaluate to a GraphQLInputObjectType.' );
     assert.end();
   });
 });
